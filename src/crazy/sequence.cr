@@ -1,6 +1,12 @@
 class NoSuchElementException < Exception
 end
 
+class Person
+  getter name
+  def initialize(@name : String)
+  end
+end
+
 module Sequences
   def sequence(*items)
     Sequence.sequence(*items)
@@ -17,9 +23,15 @@ module Sequences
     #   def map(&block : {{klass}} -> _)
     #     Sequence.new(_iterator.map{|v| block.call(v.unsafe_as({{klass}}))})
     #   end
+    #   def map(proc)
+    #     Sequence.new(_iterator.map{|v| proc.call(v.unsafe_as({{klass}}))})
+    #   end
     # end
-    #
-    # define_map(Int32)
+// NO GOOD :(
+
+
+    define_map(Int32)
+    # define_map((Int32|Sequences::Sequence::Person))
 
     def initialize(@iterator : T)
       # p "intialized with #{typeof(@iterator)}"
@@ -65,9 +77,9 @@ module Sequences
       reverse.tail.reverse
     end
 
-    def map(klass, proc)
-      Sequence.new(_iterator.map { |v| proc.call(v.unsafe_as(klass)) })
-    end
+    # def map(klass, proc)
+    #   Sequence.new(_iterator.map { |v| proc.call(v.unsafe_as(klass)) })
+    # end
 
     def fold(klass, seed, proc)
       _iterator.reduce(seed){|accumulator, value| proc.call(value.unsafe_as(klass), accumulator.unsafe_as(klass)) }

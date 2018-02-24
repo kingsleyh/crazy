@@ -1,5 +1,7 @@
 require "./spec_helper"
 
+
+
 describe Sequence do
   # it "should create empty sequence when iterable is nil" do
   #   sequence(nil).should eq(empty)
@@ -64,11 +66,20 @@ describe Sequence do
   end
 
   it "should support map with proc" do
-    sequence(1, 2, 3).map(Int32, ->(v: Int32){ v * 2}).should have(sequence(2, 4, 6))
+    sequence(1, 2, 3).map(->(v: Int32){ v * 2}).should have(sequence(2, 4, 6))
+  end
+
+  it "should support map with block" do
+    # sequence(1, 2, 3).map{|v| v * 2}.should have(sequence(2, 4, 6))
+
+# p sequence(Person.new("a"), Person.new("b"), Person.new("c")).to_a
+    p sequence(Person.new("a"), Person.new("b"), Person.new("c")).map{|v| v }.head
+
+
   end
 
   it "should support fold with proc" do
-    sequence(1, 2, 3).fold(Int32, 0, ->(a: Int32, v: Int32){ a + v }).should eq(6)
+    sequence(1, 2, 3).fold(Int32, 0, sum).should eq(6)
   end
 
 
@@ -344,4 +355,7 @@ describe Sequence do
   #   expect { empty.group_by(->(_) { true }) { |_| true } }.to raise_error(RuntimeError)
   #   expect { empty.each(->(v) { puts(v) }) { |v| puts(v) } }.to raise_error(RuntimeError)
   # end
+end
+def sum
+  ->(a: Int32, v: Int32){ a + v }
 end
