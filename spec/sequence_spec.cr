@@ -1,19 +1,22 @@
 require "./spec_helper"
 
-
-
 describe Sequence do
-  # it "should create empty sequence when iterable is nil" do
-  #   sequence(nil).should eq(empty)
+
+  # it "deal with ranges" do
+  #   p (1..Float32::INFINITY).each
   # end
 
+  it "should create empty sequence when iterable is nil" do
+    Sequence(Int32).sequence(nil).should have(Sequence(Int32).empty)
+  end
+
   it "should support head / first" do
-    sequence(1, 2).head.should eq(1)
-    sequence(1, 2).first.should eq(1)
+    Sequence(Int32).sequence(1, 2).head.should eq(1)
+    Sequence(Int32).sequence(1, 2).first.should eq(1)
   end
 
   it "should return same result when head called many times" do
-    s = sequence(1, 2)
+    s = Sequence(Int32).sequence(1, 2)
     s.head.should eq(1)
     s.head.should eq(1)
   end
@@ -24,11 +27,11 @@ describe Sequence do
   # end
   #
   it "should support reverse" do
-    sequence(1, 2, 3).reverse.should have(sequence(3, 2, 1))
+    Sequence(Int32).sequence(1, 2, 3).reverse.should have(Sequence(Int32).sequence(3, 2, 1))
   end
 
   it "should support last" do
-    sequence(1, 2, 3).last.should eq(3)
+    Sequence(Int32).sequence(1, 2, 3).last.should eq(3)
   end
 
   # it 'should support last_option' do
@@ -37,7 +40,7 @@ describe Sequence do
   # end
   #
   it "should support tail" do
-    sequence(1, 2, 3).tail.should have(sequence(2, 3))
+    Sequence(Int32).sequence(1, 2, 3).tail.should have(Sequence(Int32).sequence(2, 3))
   end
 
   # it 'should lazily return tail' do
@@ -46,46 +49,36 @@ describe Sequence do
   # end
   #
   it "should return empty tail on sequence with 1 item" do
-    sequence(1).tail.should have(empty)
+    Sequence(Int32).sequence(1).tail.should have(Sequence(Int32).empty)
   end
 
   it "should raise NoSuchElementException when getting a tail of empty" do
     expect_raises(NoSuchElementException) do
-      empty.tail
+      Sequence(Int32).empty.tail
     end
   end
 
   it "should support init" do
-    sequence(1, 2, 3).init.should have(sequence(1, 2))
+    Sequence(Int32).sequence(1, 2, 3).init.should have(Sequence(Int32).sequence(1, 2))
   end
 
   it "should raise NoSuchElementException when getting init of an empty" do
     expect_raises(NoSuchElementException) do
-      empty.init
+      Sequence(Int32).empty.init
     end
   end
 
   it "should support map with proc" do
-    sequence(1, 2, 3).map(->(v: Int32){ v * 2}).should have(sequence(2, 4, 6))
+    Sequence(Int32).sequence(1, 2, 3).map(->(v : Int32) { v * 2 }).should have(Sequence(Int32).sequence(2, 4, 6))
   end
 
   it "should support map with block" do
-    # sequence(1, 2, 3).map{|v| v * 2}.should have(sequence(2, 4, 6))
-
-# p sequence(Person.new("a"), Person.new("b"), Person.new("c")).to_a
-    p sequence(Person.new("a"), Person.new("b"), Person.new("c")).map{|v| v }.head
-
-
+    Sequence(Int32).sequence(1, 2, 3).map { |v| v * 2 }.should have(Sequence(Int32).sequence(2, 4, 6))
   end
-
-  it "should support fold with proc" do
-    sequence(1, 2, 3).fold(Int32, 0, sum).should eq(6)
-  end
-
-
-  # it "should support map with block" do
-  #   sequence(1,2,3).map{|v| v * 2}.should have(sequence(2,4,6))
-  # end
+  #
+  #   it "should support fold with proc" do
+  #     sequence(1, 2, 3).fold(Int32, 0, sum).should eq(6)
+  #   end
 
   #
   # it 'should ensure map is lazy' do
@@ -356,6 +349,7 @@ describe Sequence do
   #   expect { empty.each(->(v) { puts(v) }) { |v| puts(v) } }.to raise_error(RuntimeError)
   # end
 end
+
 def sum
-  ->(a: Int32, v: Int32){ a + v }
+  ->(a : Int32, v : Int32) { a + v }
 end

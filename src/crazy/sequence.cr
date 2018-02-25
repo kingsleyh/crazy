@@ -1,53 +1,37 @@
-class NoSuchElementException < Exception
-end
-
-class Person
-  getter name
-  def initialize(@name : String)
-  end
-end
-
 module Sequences
-  def sequence(*items)
-    Sequence.sequence(*items)
+  class WrongTypeException < Exception
   end
 
-  def empty
-    Sequence.empty
+  class NoSuchElementException < Exception
   end
 
   class Sequence(T)
-    getter iterator
+    include Indexable(T)
 
-    # macro define_map(klass)
-    #   def map(&block : {{klass}} -> _)
-    #     Sequence.new(_iterator.map{|v| block.call(v.unsafe_as({{klass}}))})
-    #   end
-    #   def map(proc)
-    #     Sequence.new(_iterator.map{|v| proc.call(v.unsafe_as({{klass}}))})
-    #   end
-    # end
-// NO GOOD :(
+    getter iterator : Iterator(T)
 
-
-    define_map(Int32)
-    # define_map((Int32|Sequences::Sequence::Person))
-
-    def initialize(@iterator : T)
-      # p "intialized with #{typeof(@iterator)}"
-      # raise "Sequence only accepts Iterator" unless
+    def initialize(@iterator : Iterator(T))
     end
 
     def self.sequence(*items)
       if items.first.nil?
-        EMPTY
+        Sequence(T).empty
       else
-        Sequence.new(items.each)
+        raise WrongTypeException.new("You specified: Sequence(#{T.inspect}) but supplied a sequence of type: #{typeof(items.first)}") unless items.first.is_a?(T)
+        Sequence.new(items.to_a.each)
       end
     end
 
     def self.empty
-      EMPTY
+      Sequence.new(([] of T).each)
+    end
+
+    def map(proc)
+      Sequence.new(_iterator.unsafe_as(ItemIterator(Array(T), T)).map { |v| proc.call(v) }.as(Iterator(T)))
+    end
+
+    def map(&block : T -> _)
+      Sequence.new(_iterator.unsafe_as(ItemIterator(Array(T), T)).map { |v| block.call(v) }.as(Iterator(T)))
     end
 
     def head
@@ -70,63 +54,27 @@ module Sequences
       unless has_next?(_iterator)
         raise NoSuchElementException.new
       end
-      Sequence.new(_iterator.skip(1))
+      Sequence.new(_iterator.unsafe_as(ItemIterator(Array(T), T)).skip(1))
     end
 
     def init
       reverse.tail.reverse
     end
 
-    # def map(klass, proc)
-    #   Sequence.new(_iterator.map { |v| proc.call(v.unsafe_as(klass)) })
-    # end
-
-    def fold(klass, seed, proc)
-      _iterator.reduce(seed){|accumulator, value| proc.call(value.unsafe_as(klass), accumulator.unsafe_as(klass)) }
+    def unsafe_at(index : Int)
+      nil
     end
-
-    # def map1(&block : T -> _)
-    #   Sequence.new(_iterator.map{|v| block.call(v)})
-    # end
-
-    # def foo(klass, proc)
-    #   # myArray : Array(Int32) = [1,2,3,4,5]
-    #   # myArray2 : Array(Int32) = _iterator.to_a.unsafe_as(Array(Int32))
-    #   # p typeof(_iterator.to_a)
-    #   # p typeof(myArray2)
-    #   # myArray2.map{|v| block.call v}
-    #    # _iterator.map{|v| block.call v}
-    #   # _iterator.map{|v| block.call v}
-    #
-    #   Sequence.new(_iterator.map do |v|
-    #     # p typeof(v)
-    #     # p v.class
-    #
-    #     proc.call(v.unsafe_as(klass))
-    #   end)
-    # end
-
-    # def foo(klass, proc)
-    #   myArray = [1,2,3,4,5]
-    #   myArray.each.map{|v| proc.call(v.unsafe_as(klass))}
-    # end
-
-    # def map(klass, &block : klass -> _)
-    #   Sequence.new(_iterator.map{|v| block.call(v.unsafe_as(klass))})
-    # end
 
     def to_a
       _iterator.to_a
     end
 
-    private def _iterator
-      @iterator.dup
-    end
-
     private def has_next?(it)
       !it.next.is_a?(Iterator::Stop)
     end
+
+    private def _iterator
+      @iterator.dup
+    end
   end
 end
-
-EMPTY = Sequence.new(([] of String).each)
