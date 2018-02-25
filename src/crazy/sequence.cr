@@ -34,6 +34,30 @@ module Sequences
       Sequence.new(_iterator.unsafe_as(ItemIterator(Array(T), T)).map { |v| block.call(v) }.as(Iterator(T)))
     end
 
+    def filter(proc)
+      Sequence.new(_iterator.unsafe_as(ItemIterator(Array(T), T)).select { |v| proc.call(v) }.as(Iterator(T)))
+    end
+
+    def filter(&block : T -> _)
+      Sequence.new(_iterator.unsafe_as(ItemIterator(Array(T), T)).select { |v| block.call(v) }.as(Iterator(T)))
+    end
+
+    def reject(proc)
+      Sequence.new(_iterator.unsafe_as(ItemIterator(Array(T), T)).reject { |v| proc.call(v) }.as(Iterator(T)))
+    end
+
+    def reject(&block : T -> _)
+      Sequence.new(_iterator.unsafe_as(ItemIterator(Array(T), T)).reject { |v| block.call(v) }.as(Iterator(T)))
+    end
+
+    def fold(seed, proc)
+      Sequence.new(_iterator.unsafe_as(ItemIterator(Array(T), T)).reduce(seed) { |acc, v| proc.call(acc,v) }.as(Iterator(T)))
+    end
+
+    def fold(seed, &block : T -> _)
+      Sequence.new(_iterator.unsafe_as(ItemIterator(Array(T), T)).reduce(seed) { |acc, v| block.call(acc,v) }.as(Iterator(T)))
+    end
+
     def head
       _iterator.first
     end

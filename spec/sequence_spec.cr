@@ -68,28 +68,21 @@ describe Sequence do
     end
   end
 
-  it "should support map with proc" do
-    Sequence(Int32).sequence(1, 2, 3).map(->(v : Int32) { v * 2 }).should have(Sequence(Int32).sequence(2, 4, 6))
-  end
-
-  it "should support map with block" do
+  it "should support map" do
+    Sequence(Int32).sequence(1, 2, 3).map(Numbers(Int32).multiply(2)).should have(Sequence(Int32).sequence(2, 4, 6))
     Sequence(Int32).sequence(1, 2, 3).map { |v| v * 2 }.should have(Sequence(Int32).sequence(2, 4, 6))
   end
-  #
-  #   it "should support fold with proc" do
-  #     sequence(1, 2, 3).fold(Int32, 0, sum).should eq(6)
-  #   end
 
-  #
-  # it 'should ensure map is lazy' do
-  #   result = sequence(returns(1), call_raises(RuntimeError.new)).map(call_fn)
+
+  # it "should ensure map is lazy" do
+  #   result = Sequence(Int32).sequence(returns(1), call_raises(RuntimeError.new)).map(call_fn)
   #   expect(result.head).to eq(1)
   # end
   #
-  # it 'should support filter' do
-  #   expect(sequence(1, 2, 3, 4).filter(even)).to eq(sequence(2, 4))
-  #   expect(sequence(1, 2, 3, 4).filter { |value| even.(value) }).to eq(sequence(2, 4))
-  # end
+  it "should support filter" do
+    Sequence(Int32).sequence(1, 2, 3, 4).filter(Numbers(Int32).even?).should have(Sequence(Int32).sequence(2, 4))
+    Sequence(Int32).sequence(1, 2, 3, 4).filter { |value| value % 2 == 0 }.should have(Sequence(Int32).sequence(2, 4))
+  end
   #
   # it 'should ensure filter is lazy' do
   #   result = sequence(returns(1), returns(2), call_raises(RuntimeError.new)).map(call_fn).filter(even)
@@ -100,20 +93,20 @@ describe Sequence do
   #   expect(sequence(1, 2, 3, 4).filter(is_not(even))).to eq(sequence(1, 3))
   # end
   #
-  # it 'should support reject' do
-  #   expect(sequence(1, 2, 3, 4).reject(even)).to eq(sequence(1, 3))
-  #   expect(sequence(1, 2, 3, 4).reject { |value| even.(value) }).to eq(sequence(1, 3))
-  # end
-  #
-  # it 'should support fold (aka fold_left)' do
-  #   expect(sequence(1, 2, 3).fold(0, sum)).to eq(6)
-  #   expect(sequence(1, 2, 3).fold(0) { |a, b| a + b }).to eq(6)
-  #   expect(sequence(1, 2, 3).fold_left(0, sum)).to eq(6)
-  #   expect(sequence(1, 2, 3).fold_left(0) { |a, b| a + b }).to eq(6)
-  #   expect(sequence('1', '2', '3').fold(0, join)).to eq('0123')
-  #   expect(sequence('1', '2', '3').fold_left(0, join)).to eq('0123')
-  # end
-  #
+  it "should support reject" do
+    Sequence(Int32).sequence(1, 2, 3, 4).reject(Numbers(Int32).even?).should have(Sequence(Int32).sequence(1, 3))
+    Sequence(Int32).sequence(1, 2, 3, 4).reject { |value| value % 2 == 0 }.should have(Sequence(Int32).sequence(1, 3))
+  end
+
+  pending "should support fold (aka fold_left)" do
+    # Sequence(Int32).sequence(1, 2, 3).fold(0, Numbers(Int32).sum).should eq(6)
+    # expect(sequence(1, 2, 3).fold(0) { |a, b| a + b }).to eq(6)
+    # expect(sequence(1, 2, 3).fold_left(0, sum)).to eq(6)
+    # expect(sequence(1, 2, 3).fold_left(0) { |a, b| a + b }).to eq(6)
+    # expect(sequence('1', '2', '3').fold(0, join)).to eq('0123')
+    # expect(sequence('1', '2', '3').fold_left(0, join)).to eq('0123')
+  end
+
   # it 'should support reduce (aka reduce_left)' do
   #   expect(sequence(1, 2, 3).reduce(sum)).to eq(6)
   #   expect(sequence(1, 2, 3).reduce { |a, b| a + b }).to eq(6)
@@ -348,8 +341,4 @@ describe Sequence do
   #   expect { empty.group_by(->(_) { true }) { |_| true } }.to raise_error(RuntimeError)
   #   expect { empty.each(->(v) { puts(v) }) { |v| puts(v) } }.to raise_error(RuntimeError)
   # end
-end
-
-def sum
-  ->(a : Int32, v : Int32) { a + v }
 end
