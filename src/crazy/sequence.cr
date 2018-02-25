@@ -51,11 +51,11 @@ module Sequences
     end
 
     def fold(seed, proc)
-      Sequence.new(_iterator.unsafe_as(ItemIterator(Array(T), T)).reduce(seed) { |acc, v| proc.call(acc,v) }.as(Iterator(T)))
+      _iterator.unsafe_as(ItemIterator(Array(T), T)).reduce(seed) { |acc, v| proc.call(acc,v) }
     end
 
     def fold(seed, &block : T -> _)
-      Sequence.new(_iterator.unsafe_as(ItemIterator(Array(T), T)).reduce(seed) { |acc, v| block.call(acc,v) }.as(Iterator(T)))
+      _iterator.unsafe_as(ItemIterator(Array(T), T)).reduce(seed) { |acc, v| block.call(acc,v) }
     end
 
     def head

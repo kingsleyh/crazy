@@ -98,8 +98,8 @@ describe Sequence do
     Sequence(Int32).sequence(1, 2, 3, 4).reject { |value| value % 2 == 0 }.should have(Sequence(Int32).sequence(1, 3))
   end
 
-  pending "should support fold (aka fold_left)" do
-    # Sequence(Int32).sequence(1, 2, 3).fold(0, Numbers(Int32).sum).should eq(6)
+  it "should support fold (aka fold_left)" do
+    Sequence(Int32).sequence(1, 2, 3).fold(0, Numbers(Int32).sum).should eq(6)
     # expect(sequence(1, 2, 3).fold(0) { |a, b| a + b }).to eq(6)
     # expect(sequence(1, 2, 3).fold_left(0, sum)).to eq(6)
     # expect(sequence(1, 2, 3).fold_left(0) { |a, b| a + b }).to eq(6)
